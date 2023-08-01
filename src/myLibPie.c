@@ -14,6 +14,15 @@
 #include "gdfontg.h"
 
 
+/**
+ * @brief createColor
+ * @param nom
+ * @param indice
+ * @param red
+ * @param green
+ * @param blue
+ * @return
+ */
 Color *createColor(char *nom, int indice, int red, int green, int blue){
     Color *newColor = malloc(sizeof(Color));
     strncpy(newColor->nom,nom,254);
@@ -164,7 +173,8 @@ void displayHelp(char *execName)
     printf("\t -d\t\tDisplay : affiche le graphique\n");
     printf("\t -i\t\tHistogramme - Par défaut graphique de type pie (camembert)\n");
     printf("\t -s\t\tTaille de l'image en pixels. La taille ne doit pas être inférieure à %d. Taille par défaut : %d\n",MIN_IMAGE_SIZE, IMAGE_SIZE);
-    printf("_t -b\t\tCouleur de fond. Les valeurs autorisées sont white et gray. La valeur par défaut est black\n");
+    printf("\t -b\t\tCouleur de fond. Les valeurs autorisées sont white et gray. La valeur par défaut est black\n");
+    printf("\t -3\t\tGraphique en 3D\n");
     printf("\t -h\t\tHelp - Affiche cette page d'aide\n");
 
     printf("\n");

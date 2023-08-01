@@ -19,6 +19,12 @@
 #include "gdfontl.h"
 #include "gdfontg.h"
 
+/**
+ * @brief main
+ * @param argc
+ * @param argv
+ * @return
+ */
 
 int main (int argc, char **argv)
 {
@@ -28,6 +34,7 @@ int main (int argc, char **argv)
     char *ficInOpt = NULL;
     char *bgColorOpt = NULL;
     int sOpt, sFlag = 0;
+    int d3Opt = 0;
     char titre[255];
     char ficOut[255];
     int display = 0;
@@ -41,7 +48,7 @@ int main (int argc, char **argv)
     opterr = 0;
     // lecture des options -t titre -o outputfile -d (display) -f inputFile -h (help) -i (histogramme) -s (size) -b (backgroundColor)
 
-    while( (c = getopt (argc, argv,"dt:o:f:his:b:")) != -1)
+    while( (c = getopt (argc, argv,"dt:o:f:his:b:3")) != -1)
     {
         switch ((char)c)
         {
@@ -69,6 +76,9 @@ int main (int argc, char **argv)
             break;
             case 'b': // backgrounColor
                 bgColorOpt = optarg;
+            break;
+            case '3':
+                d3Opt = 1;
             break;
             case '?':
                 if ((optopt == 't')||(optopt == 'o')||(optopt == 's')||(optopt == 'b'))
@@ -148,7 +158,6 @@ int main (int argc, char **argv)
 
     // -f
 
-
     if (ficInOpt) // lecture des datas dans fichier formaté xml
     {
         pieChart = readDataFile(pieChart,ficInOpt);
@@ -172,6 +181,13 @@ int main (int argc, char **argv)
             pieChart= appendPieData(pieChart,argv[i],strtod(argv[i+1],NULL));
 
         }
+    }
+
+    // -3
+
+    if (d3Opt ==1)
+    {
+        pieChart->type = TYPE_3D;  // prévoir un systeme de flags pour pie, histo 2D et 3D
     }
 
     // check datas
@@ -225,8 +241,8 @@ int main (int argc, char **argv)
     if(pieChart->type == TYPE_PIE)
     {
         int xc = imageSize /2;
-        int yc = (imageSize + H_TITRE) /2;
-        double ratio = 0.5;
+        int yc = (imageSize /2) + H_TITRE;
+        double ratio = 0.6;
         int w = imageSize * ratio;
         int h = imageSize * ratio;
         int textRadius = w /2 * 1.2;
@@ -296,6 +312,87 @@ int main (int argc, char **argv)
             rectStartX+=largeurRectangle;
             colorIndex++;
         }
+
+    }
+    else if (pieChart->type == TYPE_3D )
+    {
+        int xc = imageSize /2;
+        int yc = (imageSize + H_TITRE) /2;
+        double ratio = 0.5;
+        double zRatio = 0.6;
+        int w = imageSize * ratio;
+        int h = imageSize * ratio * zRatio;
+        int textRadius = w /2 * 1.4;
+        int percentRadius = w * 0.4;
+        double ratioAngle = calcRatioPourcent(pieChart);
+        double curAngle = 0.0;
+        char label[256];
+        gdImageFilledEllipse(im, xc  , yc + 40, w+2,h +2,gdFgColor);
+        PieData *curPieData = pieChart->first;
+        int colorIndex=2;
+        for(int offset =0; offset <10; offset ++)
+        {
+            PieData *curPieData = pieChart->first;
+            int colorIndex=2;
+            double curAngle = 0.0;
+
+            while(curPieData != NULL) // le bas
+            {
+                double curAngle2 = curAngle  + curPieData->valeur * ratioAngle * 360.0 /100.0;
+                gdImageFilledArc(im,xc ,yc + 40 - 4*offset,w,h,(int)curAngle,(int)curAngle2,gdColors[colorIndex],0);
+
+                curAngle = curAngle2;
+                colorIndex++;
+                curPieData = curPieData->next;
+
+            }
+        }
+        curPieData = pieChart->first;
+        colorIndex=2;
+        curAngle = 0.0;
+        gdImageSetThickness(im,3);
+        curAngle = 0.0;
+        while(curPieData != NULL) // les montants
+        {
+
+            int x1 = xc + w *cos(curAngle * M_PI /180) / 2;
+            int y1 = yc + h * sin (curAngle * M_PI /180) / 2;
+            gdImageLine(im, x1,y1,x1,y1+40, gdBgColor);
+
+            curAngle = curAngle + curPieData->valeur * ratioAngle * 360.0 /100.0;
+            curPieData = curPieData->next;
+
+        }
+        curPieData = pieChart->first;
+        colorIndex=2;
+        gdImageFilledEllipse(im, xc , yc, w+2,h +2,gdFgColor);
+        curAngle = 0.0;
+        while(curPieData != NULL) //le haut
+        {
+            double curAngle2 =curAngle  + curPieData->valeur * ratioAngle * 360.0 /100.0;
+            gdImageFilledArc(im,xc,yc,w,h,(int)curAngle, (int)curAngle2 , gdColors[colorIndex],0);
+            // label
+            int xText = (int) (xc + textRadius * cos ( (curAngle + curAngle2)/2 * M_PI/180 ));
+            int yText = (int) (yc + textRadius * zRatio * sin ( (curAngle + curAngle2)/2 * M_PI/180 ));
+            if((((curAngle + curAngle2)/2)>90) && (((curAngle + curAngle2)/2)<270)){  // partie gauche du camembert
+                xText -= (int)strlen(curPieData->label)*8;
+
+            }
+            gdImageString(im, fonts[2],(int)xText,(int)yText,(unsigned char *)curPieData->label,gdColors[colorIndex]);
+
+            //Pourcentages
+            xText = (int) (xc + percentRadius * cos ( (curAngle + curAngle2)/2 * M_PI/180 ));
+            if((((curAngle + curAngle2)/2)>270) || (((curAngle + curAngle2)/2)<90)){  // partie droite du camembert
+                xText -= 30; // Décalage du texte vers la gauche pour avoir un affichage plus homogène
+            }
+            yText = (int) (yc + percentRadius * zRatio * sin ( (curAngle + curAngle2)/2 * M_PI/180 ));
+            sprintf(label,"%.2f%%",curPieData->valeur * ratioAngle);
+            gdImageString(im, fonts[2],(int)xText,(int)yText,(unsigned char *)label ,gdBlackColor);
+            curAngle = curAngle2;
+            colorIndex++;
+            curPieData = curPieData->next;
+        }
+
 
     }
 

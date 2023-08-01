@@ -23,6 +23,7 @@
 #define H_TITRE 80
 #define TYPE_PIE 1
 #define TYPE_HISTO 2
+#define TYPE_3D 3
 
 typedef struct PieDataType{
     double valeur;
@@ -44,12 +45,39 @@ typedef struct {
     int blue;
 } Color;
 
+/**
+ * @brief createColor
+ * @param nom
+ * @param indice
+ * @param red
+ * @param green
+ * @param blue
+ * @return
+ */
 Color *createColor(char *nom, int indice, int red, int green, int blue);
 
+/**
+ * @brief createPieData
+ * @param label
+ * @param val
+ * @return
+ */
 PieData *createPieData(char *label, double val);
 
+/**
+ * @brief newPieChart
+ * @param titre
+ * @return
+ */
 PieChart *newPieChart(char *titre);
 
+/**
+ * @brief appendPieData
+ * @param pieChart
+ * @param label
+ * @param val
+ * @return
+ */
 PieChart *appendPieData(PieChart *pieChart,char *label, double val);
 
 int getPieChartDataCount(PieChart *pieChart);
