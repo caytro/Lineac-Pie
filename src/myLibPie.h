@@ -19,6 +19,7 @@
 #include "gdfontg.h"
 
 #define IMAGE_SIZE 712
+#define MIN_IMAGE_SIZE 128
 #define H_TITRE 128
 #define TYPE_PIE 1
 #define TYPE_HISTO 2

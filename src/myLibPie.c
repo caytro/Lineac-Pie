@@ -13,6 +13,7 @@
 #include "gdfontg.h"
 
 #define IMAGE_SIZE 712
+#define MIN_IMAGE_SIZE 128
 #define H_TITRE 128
 #define TYPE_PIE 1
 #define TYPE_HISTO 2
@@ -153,7 +154,7 @@ PieChart *readDataFile(PieChart *pieChart,char *ficIn)
 
 void displayHelp(char *execName)
 {
-    printf("\n** Usage : %s [-o outputFileName] [-f inputFileName] [-t title] [-d] [-i] [-h] label1 valeur1 label2 valeur2 ...\n",execName);
+    printf("\n** Usage : %s [-o outputFileName] [-f inputFileName] [-t title] [-d] [-i] [-s size] [-h] label1 valeur1 label2 valeur2 ...\n",execName);
     printf("\tSi l'option -f est présente, les arguments label1 valeur1 ... seront ignorés\n\n");
     printf("\t -o\t\tEnregistre dans le fichier. Défault : pieChart.png\n");
     printf("\t -f\t\tLit les données dans le fichier au format XML\n");
@@ -171,5 +172,8 @@ void displayHelp(char *execName)
     printf("\t -t\t\tTitre du graphique\n");
     printf("\t -d\t\tDisplay : affiche le graphique\n");
     printf("\t -i\t\tHistogramme - Par défaut graphique de type pie (camembert)\n");
+    printf("\t -s \t\tTaille de l'image en pixels. La taille ne doit pas être inférieure à %d\n",MIN_IMAGE_SIZE);
+    printf("\t -h\t\tHelp - Affiche cette page d'aide\n");
+
     printf("\n");
 }

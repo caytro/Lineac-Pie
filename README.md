@@ -4,7 +4,7 @@ Ce projet en C permet de générer des graphiques circulaires et des histogramme
 
 Le graphique est enregistré au format png et peut être visualisé directement à l'écran.
 ## Utilisation
-` pie [-o outputFileName] [-f inputFileName] [-t title] [-d] [-i] [-h] label1 valeur1 label2 valeur2 ... `
+` pie [-o outputFileName] [-f inputFileName] [-t title] [-d] [-i] [-s size] [-h] label1 valeur1 label2 valeur2 ... `
 
 Si l'option -f est présente, les arguments label1 valeur1 ... seront ignorés
 
@@ -22,8 +22,10 @@ Si l'option -f est présente, les arguments label1 valeur1 ... seront ignorés
 				</data>
 				...
 			</datas>
-	 -t		Titre du graphique
+	 -t		Titre du graphique - Valeur par défaut : Mon Graphique
 	 -d		Display : affiche le graphique
-	 -i		Histogramme - Par défaut graphique de type pie (camembert)
+	 -i		Histogramme - Par défaut le graphique est de type pie (camembert)
+	 -s		Taille de l'image en pixels. l'option -h permet de connaitre la taille minimale autorisée.
+	 -h		Help : Affiche cette page d'aide
 
 

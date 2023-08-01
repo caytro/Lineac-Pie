@@ -26,40 +26,46 @@ int main (int argc, char **argv)
     char *titreOpt = NULL;
     char *ficOutOpt = NULL;
     char *ficInOpt = NULL;
+    int sOpt, sFlag = 0;
     char titre[255];
     char ficOut[255];
     int display = 0;
     int histo = 0;
     int help = 0;
+    int imageSize = IMAGE_SIZE;
     int c, index;
 
     opterr = 0;
     // lecture des options -t titre -o outputfile -d (display) -f inputFile -h (help) -i (histogramme)
 
-    while( (c = getopt (argc, argv,"dt:o:f:hi")) != -1)
+    while( (c = getopt (argc, argv,"dt:o:f:his:")) != -1)
     {
         switch ((char)c)
         {
-            case 'd' :
+            case 'd' : // display graph
                 display = 1;
             break;
-            case 't' :
+            case 't' : // titre
                 titreOpt = optarg;
             break;
-            case 'o' :
+            case 'o' : // outputFileName
                 ficOutOpt = optarg;
             break;
-            case 'f':
+            case 'f': // inputFileName (XML)
                 ficInOpt = optarg;
             break;
-            case 'i':
+            case 'i': // histogramme
                 histo = 1;
             break;
-            case 'h':
+            case 'h': // help
                 help = 1;
             break;
+            case 's': // size
+                sOpt = atoi(optarg);
+                sFlag = 1;
+            break;
             case '?':
-                if ((optopt == 't')||(optopt == 'o'))
+                if ((optopt == 't')||(optopt == 'o')||(optopt == 's'))
                       fprintf (stderr, "Option -%c requires an argument.\n", optopt);
                 else if (isprint (optopt))
                   fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -77,6 +83,18 @@ int main (int argc, char **argv)
     {
         displayHelp(argv[0]);
         return 0;
+    }
+    if (sFlag == 1 )
+    {
+        if(sOpt >= MIN_IMAGE_SIZE)
+        {
+            imageSize = sOpt;
+        }
+        else
+        {
+            printf("\n** Parametre incorrect -s : la taille de l'image doit être supérieure ou égale à %d\n",MIN_IMAGE_SIZE);
+            return 1;
+        }
     }
     if (titreOpt) strncpy(titre,titreOpt,254); else strcpy(titre,"Mon graphique");
     if (ficOutOpt) strncpy(ficOut,ficOutOpt,254); else strcpy(ficOut,"pieChart.png");
@@ -114,7 +132,7 @@ int main (int argc, char **argv)
     }
 
     // Création de l'image
-    gdImagePtr im = gdImageCreate(IMAGE_SIZE,IMAGE_SIZE+H_TITRE);
+    gdImagePtr im = gdImageCreate(imageSize,imageSize+H_TITRE);
 
 
     // Colors
@@ -152,21 +170,21 @@ int main (int argc, char **argv)
     fonts[4] = gdFontGetGiant ();
 
     // Titre
-    gdImageString(im, fonts[4],(IMAGE_SIZE - strlen(titre) * 10) /2,H_TITRE/2 ,(unsigned char *)titre ,colorWhite);
+    gdImageString(im, fonts[4],(imageSize - strlen(titre) * 10) /2,H_TITRE/2 ,(unsigned char *)titre ,colorWhite);
 
     // focus sur la zone de dessin
-    gdImageFilledRectangle(im,1,H_TITRE,IMAGE_SIZE,IMAGE_SIZE+H_TITRE,colorDarkGray);
+    gdImageFilledRectangle(im,1,H_TITRE,imageSize,imageSize+H_TITRE,colorDarkGray);
 
 
      // Pie
 
     if(pieChart->type == TYPE_PIE)
     {
-        int xc = IMAGE_SIZE /2;
-        int yc = (IMAGE_SIZE + H_TITRE) /2;
+        int xc = imageSize /2;
+        int yc = (imageSize + H_TITRE) /2;
         double ratio = 0.5;
-        int w = IMAGE_SIZE * ratio;
-        int h = IMAGE_SIZE * ratio;
+        int w = imageSize * ratio;
+        int h = imageSize * ratio;
         int textRadius = w /2 * 1.2;
         int percentRadius = w * 0.4;
         double ratioAngle = calcRatioPourcent(pieChart);
@@ -207,11 +225,11 @@ int main (int argc, char **argv)
         double maxVal= getMaxPieChartValue(pieChart);
         int nbDatas = getPieChartDataCount(pieChart);
         if(nbDatas ==0) return 1;
-        int marginH = IMAGE_SIZE * 0.1; // margin left et margin right
-        int marginTop = IMAGE_SIZE * 0.1;
+        int marginH = imageSize * 0.1; // margin left et margin right
+        int marginTop = imageSize * 0.1;
         int textZoneHeight = 200; // hauteur de l'espace destiné à écrire les labels
-        int graphicWidth = IMAGE_SIZE - 2 * marginH;
-        int graphicHeight = IMAGE_SIZE - marginTop - textZoneHeight;
+        int graphicWidth = imageSize - 2 * marginH;
+        int graphicHeight = imageSize - marginTop - textZoneHeight;
         int originY = H_TITRE + graphicHeight + marginTop;
         int originX = marginH;
         int largeurRectangle = graphicWidth / nbDatas;
