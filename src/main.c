@@ -239,7 +239,6 @@ int main (int argc, char **argv)
 
     // enregistrement
     FILE *out = fopen(ficOut,"wb");
-    printf("\nEnregistrement dans %s\n",ficOut);
     gdImagePng(im,out);
     fclose(out);
     if (display)

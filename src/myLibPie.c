@@ -118,7 +118,6 @@ PieChart *parseError(PieChart *pieChart, char *chaineLue,int ligne){
 
 PieChart *readDataFile(PieChart *pieChart,char *ficIn)
 {
-    printf("\nOuverture de %s...\n",ficIn);
     FILE *fp = fopen(ficIn,"r");
     if (fp == NULL)
     {
@@ -149,7 +148,6 @@ PieChart *readDataFile(PieChart *pieChart,char *ficIn)
 
     } while (strcmp(chaineLue,"</Datas>\n" ) !=0 );
     fclose(fp);
-    printf("\n...Ok\n");
     return pieChart;
 }
 
