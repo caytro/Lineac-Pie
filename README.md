@@ -8,8 +8,6 @@ Le graphique est enregistré au format png et peut être visualisé directement 
 
 Si l'option -f est présente, les arguments label1 valeur1 ... seront ignorés
 
-Si l'option -f est présente, les arguments label1 valeur1 ... seront ignorés
-
 
 	 -o		Enregistre dans le fichier. Défault : pieChart.png
 	 -f		Lit les données dans le fichier au format XML
