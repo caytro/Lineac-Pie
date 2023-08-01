@@ -20,7 +20,7 @@
 
 #define IMAGE_SIZE 712
 #define MIN_IMAGE_SIZE 128
-#define H_TITRE 128
+#define H_TITRE 80
 #define TYPE_PIE 1
 #define TYPE_HISTO 2
 
@@ -36,7 +36,15 @@ typedef struct {
     PieData *first;
 } PieChart;
 
+typedef struct {
+    char nom[255];
+    int indice;
+    int red;
+    int green;
+    int blue;
+} Color;
 
+Color *createColor(char *nom, int indice, int red, int green, int blue);
 
 PieData *createPieData(char *label, double val);
 

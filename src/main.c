@@ -26,6 +26,7 @@ int main (int argc, char **argv)
     char *titreOpt = NULL;
     char *ficOutOpt = NULL;
     char *ficInOpt = NULL;
+    char *bgColorOpt = NULL;
     int sOpt, sFlag = 0;
     char titre[255];
     char ficOut[255];
@@ -35,10 +36,12 @@ int main (int argc, char **argv)
     int imageSize = IMAGE_SIZE;
     int c, index;
 
-    opterr = 0;
-    // lecture des options -t titre -o outputfile -d (display) -f inputFile -h (help) -i (histogramme)
+    Color *myPalette[16];
 
-    while( (c = getopt (argc, argv,"dt:o:f:his:")) != -1)
+    opterr = 0;
+    // lecture des options -t titre -o outputfile -d (display) -f inputFile -h (help) -i (histogramme) -s (size) -b (backgroundColor)
+
+    while( (c = getopt (argc, argv,"dt:o:f:his:b:")) != -1)
     {
         switch ((char)c)
         {
@@ -64,8 +67,11 @@ int main (int argc, char **argv)
                 sOpt = atoi(optarg);
                 sFlag = 1;
             break;
+            case 'b': // backgrounColor
+                bgColorOpt = optarg;
+            break;
             case '?':
-                if ((optopt == 't')||(optopt == 'o')||(optopt == 's'))
+                if ((optopt == 't')||(optopt == 'o')||(optopt == 's')||(optopt == 'b'))
                       fprintf (stderr, "Option -%c requires an argument.\n", optopt);
                 else if (isprint (optopt))
                   fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -79,11 +85,17 @@ int main (int argc, char **argv)
         }
 
     }
+
+    // -h
+
     if (help)
     {
         displayHelp(argv[0]);
         return 0;
     }
+
+    // -s
+
     if (sFlag == 1 )
     {
         if(sOpt >= MIN_IMAGE_SIZE)
@@ -96,10 +108,46 @@ int main (int argc, char **argv)
             return 1;
         }
     }
+
+    // -t
+
     if (titreOpt) strncpy(titre,titreOpt,254); else strcpy(titre,"Mon graphique");
     if (ficOutOpt) strncpy(ficOut,ficOutOpt,254); else strcpy(ficOut,"pieChart.png");
     PieChart *pieChart = newPieChart(titre);
+
+
+    // -i
+
     if (histo) pieChart->type = TYPE_HISTO;
+
+    // -b
+
+    if (bgColorOpt)
+    {
+        if (strcmp(bgColorOpt,"white")==0)
+        {
+            myPalette[0] = createColor("bgColor",0,255,255,255);
+            myPalette[1] = createColor("fgColor",1,0,0,0);
+        }
+        else if (strcmp(bgColorOpt,"gray")==0)
+        {
+            myPalette[0] = createColor("bgColor",0,128,128,128);
+            myPalette[1] = createColor("fgColor",1,0,0,0);
+        }
+        else
+        {
+            printf("\n** Erreur argument incorrect -b. Les valeurs possibles sont white ou gray\n");
+            return 1;
+        }
+    }
+    else //par defaut bg = black
+    {
+        myPalette[0] = createColor("bgColor",0,0,0,0);
+        myPalette[1] = createColor("fgColor",1,255,255,255);
+    }
+
+    // -f
+
 
     if (ficInOpt) // lecture des datas dans fichier formaté xml
     {
@@ -126,6 +174,8 @@ int main (int argc, char **argv)
         }
     }
 
+    // check datas
+
     if (checkPieChartIntegrity(pieChart) != 0){
         printf("\n** Erreur : Les datas contiennent des valeurs non conformes\n");
         return 1;
@@ -136,30 +186,24 @@ int main (int argc, char **argv)
 
 
     // Colors
-
-    int colors[16];
-    int colorBlack=gdImageColorAllocate(im,0,0,0);
-    int colorRed=gdImageColorAllocate(im,255,0,0);
-    int colorGreen=gdImageColorAllocate(im,0,255,0);
-    int colorBlue=gdImageColorAllocate(im,80,80,255);
-    int colorWhite=gdImageColorAllocate(im,255,255,255);
-    int colorYellow=gdImageColorAllocate(im,240,240,0);
-    int colorOrange=gdImageColorAllocate(im,255,128,0);
-    int colorViolet=gdImageColorAllocate(im,255,0,255);
-    int colorGray=gdImageColorAllocate(im,200,200,200);
-    int colorDarkGray=gdImageColorAllocate(im,30,30,30);
-    int indiceColor = 0;
-    colors[indiceColor++]=colorBlack;
-    colors[indiceColor++]=colorRed;
-    colors[indiceColor++]=colorGreen;
-    colors[indiceColor++]=colorBlue;
-    colors[indiceColor++]=colorWhite;
-    colors[indiceColor++]=colorYellow;
-    colors[indiceColor++]=colorOrange;
-    colors[indiceColor++]=colorViolet;
-    colors[indiceColor++]=colorGray;
-    colors[indiceColor++]=colorDarkGray;
-
+    myPalette[2]=createColor("rouge",2,255,0,0);
+    myPalette[3]=createColor("vert",2,0,255,0);
+    myPalette[4]=createColor("bleu",2,0,0,255);
+    myPalette[5]=createColor("bleuClair",2,180,180,255);
+    myPalette[6]=createColor("jaune",2,200,200,0);
+    myPalette[7]=createColor("orange",2,255,128,0);
+    myPalette[8]=createColor("violet",2,255,0,255);
+    myPalette[9]=createColor("lightGray",2,200,200,200);
+    myPalette[10]=createColor("darkGray",2,30,30,30);
+    myPalette[11]=createColor("black",2,0,0,0);
+    int gdColors[12];
+    for (int colorIndex = 0; colorIndex<12; colorIndex++)
+    {
+        gdColors[colorIndex] = gdImageColorAllocate(im,myPalette[colorIndex]->red,myPalette[colorIndex]->green,myPalette[colorIndex]->blue);
+    }
+    int gdBgColor = gdColors[0];
+    int gdFgColor = gdColors[1];
+    int gdBlackColor = gdColors[11];
 
     // Fonts
     gdFontPtr fonts[5];
@@ -170,10 +214,10 @@ int main (int argc, char **argv)
     fonts[4] = gdFontGetGiant ();
 
     // Titre
-    gdImageString(im, fonts[4],(imageSize - strlen(titre) * 10) /2,H_TITRE/2 ,(unsigned char *)titre ,colorWhite);
+    gdImageString(im, fonts[4],(imageSize - strlen(titre) * 10) /2,H_TITRE/2 ,(unsigned char *)titre ,gdColors[1]);
 
     // focus sur la zone de dessin
-    gdImageFilledRectangle(im,1,H_TITRE,imageSize,imageSize+H_TITRE,colorDarkGray);
+    gdImageFilledRectangle(im,1,H_TITRE,imageSize,imageSize+H_TITRE,gdBgColor);
 
 
      // Pie
@@ -190,20 +234,21 @@ int main (int argc, char **argv)
         double ratioAngle = calcRatioPourcent(pieChart);
         double curAngle = 0;
         char label[256];
+        gdImageFilledEllipse(im, xc, yc, w+2,h+2,gdFgColor);
         PieData *curPieData = pieChart->first;
-        int colorIndex=1;
+        int colorIndex=2;
         while(curPieData != NULL)
         {
             int s = (int) round(curAngle);
             int e = (int) round(curAngle  + curPieData->valeur * ratioAngle * 360.0 /100.0);
-            gdImageFilledArc(im,xc,yc,w,h,(int)s,(int)e,colors[colorIndex],0);
+            gdImageFilledArc(im,xc,yc,w,h,(int)s,(int)e,gdColors[colorIndex],0);
             // label
             int xText = (int) (xc + textRadius * cos ( (e + s)/2 * M_PI/180 ));
             int yText = (int) (yc + textRadius * sin ( (e + s)/2 * M_PI/180 ));
             if((((e+s)/2)>90) && (((e+s)/2)<270)){  // partie gauche du camembert
                 xText -= strlen((char *)curPieData->label)*8; // Décalage du texte vers la gauche pour avoir un affichage plus homogène
             }
-            gdImageString(im, fonts[2],(int)xText,(int)yText,(unsigned char *)curPieData->label,colors[colorIndex]);
+            gdImageString(im, fonts[2],(int)xText,(int)yText,(unsigned char *)curPieData->label,gdColors[colorIndex]);
 
             //Pourcentages
             xText = (int) (xc + percentRadius * cos ( (e + s)/2 * M_PI/180 ));
@@ -212,7 +257,7 @@ int main (int argc, char **argv)
             }
             yText = (int) (yc + percentRadius * sin ( (e + s)/2 * M_PI/180 ));
             sprintf(label,"%.2f%%",curPieData->valeur * ratioAngle);
-            gdImageString(im, fonts[2],(int)xText,(int)yText,(unsigned char *)label ,colorBlack);
+            gdImageString(im, fonts[2],(int)xText,(int)yText,(unsigned char *)label ,gdBlackColor);
             curAngle = (double) e;
             colorIndex++;
             curPieData = curPieData->next;
@@ -233,20 +278,20 @@ int main (int argc, char **argv)
         int originY = H_TITRE + graphicHeight + marginTop;
         int originX = marginH;
         int largeurRectangle = graphicWidth / nbDatas;
-        gdImageLine(im,originX, originY,originX+graphicWidth,originY,colorWhite);
-        gdImageLine(im,originX,originY,originX,originY-graphicHeight,colorWhite);
+        gdImageLine(im,originX, originY,originX+graphicWidth,originY,gdFgColor);
+        gdImageLine(im,originX,originY,originX,originY-graphicHeight,gdFgColor);
         PieData *curPieData = pieChart->first;
-        int colorIndex=1;
+        int colorIndex=2;
         int rectStartX = originX+1;
         double yFactor = graphicHeight / maxVal;
         char label[20];
         while(curPieData != NULL)
         {
             int hauteur = (int) (yFactor * curPieData->valeur);
-            gdImageFilledRectangle(im,rectStartX, originY-1,rectStartX + largeurRectangle, originY - hauteur ,colors[colorIndex]);
-            gdImageStringUp(im, fonts[2],rectStartX + largeurRectangle /2, originY + strlen(curPieData->label) * 8,(unsigned char *)curPieData->label, colors[colorIndex]);
+            gdImageFilledRectangle(im,rectStartX, originY-1,rectStartX + largeurRectangle, originY - hauteur ,gdColors[colorIndex]);
+            gdImageStringUp(im, fonts[2],rectStartX + largeurRectangle /2, originY + strlen(curPieData->label) * 8,(unsigned char *)curPieData->label, gdColors[colorIndex]);
             sprintf(label,"%.2f",curPieData->valeur);
-            gdImageString(im,fonts[2], rectStartX + largeurRectangle /2, originY - hauteur - marginTop /2,(unsigned char *)label, colorWhite);
+            gdImageString(im,fonts[2], rectStartX + largeurRectangle /2 - 16, originY - hauteur - marginTop /2,(unsigned char *)label, gdFgColor);
             curPieData =curPieData->next;
             rectStartX+=largeurRectangle;
             colorIndex++;

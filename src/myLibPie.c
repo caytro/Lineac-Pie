@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "myLibXML.h"
+#include "myLibPie.h"
 #include "gd.h"
 #include "gdfontt.h"
 #include "gdfonts.h"
@@ -12,26 +13,16 @@
 #include "gdfontl.h"
 #include "gdfontg.h"
 
-#define IMAGE_SIZE 712
-#define MIN_IMAGE_SIZE 128
-#define H_TITRE 128
-#define TYPE_PIE 1
-#define TYPE_HISTO 2
 
-typedef struct PieDataType{
-    double valeur;
-    char label[255];
-    struct PieDataType *next;
-} PieData;
-
-typedef struct {
-    char titre[255];
-    int type;
-    PieData *first;
-} PieChart;
-
-
-
+Color *createColor(char *nom, int indice, int red, int green, int blue){
+    Color *newColor = malloc(sizeof(Color));
+    strncpy(newColor->nom,nom,254);
+    newColor->indice = indice;
+    newColor->red = red;
+    newColor->green = green;
+    newColor->blue = blue;
+    return newColor;
+}
 PieData *createPieData(char *label, double val){
     PieData *new = malloc(sizeof(PieData));
     strcpy(new->label,label);
@@ -154,7 +145,7 @@ PieChart *readDataFile(PieChart *pieChart,char *ficIn)
 
 void displayHelp(char *execName)
 {
-    printf("\n** Usage : %s [-o outputFileName] [-f inputFileName] [-t title] [-d] [-i] [-s size] [-h] label1 valeur1 label2 valeur2 ...\n",execName);
+    printf("\n** Usage : %s [-o outputFileName] [-f inputFileName] [-t title] [-d] [-i] [-s size] [-b bgColor] [-h] label1 valeur1 label2 valeur2 ...\n",execName);
     printf("\tSi l'option -f est présente, les arguments label1 valeur1 ... seront ignorés\n\n");
     printf("\t -o\t\tEnregistre dans le fichier. Défault : pieChart.png\n");
     printf("\t -f\t\tLit les données dans le fichier au format XML\n");
@@ -172,7 +163,8 @@ void displayHelp(char *execName)
     printf("\t -t\t\tTitre du graphique\n");
     printf("\t -d\t\tDisplay : affiche le graphique\n");
     printf("\t -i\t\tHistogramme - Par défaut graphique de type pie (camembert)\n");
-    printf("\t -s \t\tTaille de l'image en pixels. La taille ne doit pas être inférieure à %d\n",MIN_IMAGE_SIZE);
+    printf("\t -s\t\tTaille de l'image en pixels. La taille ne doit pas être inférieure à %d. Taille par défaut : %d\n",MIN_IMAGE_SIZE, IMAGE_SIZE);
+    printf("_t -b\t\tCouleur de fond. Les valeurs autorisées sont white et gray. La valeur par défaut est black\n");
     printf("\t -h\t\tHelp - Affiche cette page d'aide\n");
 
     printf("\n");
