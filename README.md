@@ -1,16 +1,21 @@
 # Lineac Pie 
 ## Description
-Ce projet en C permet de générer des graphiques circulaires et des histogrammes en ligne de commandes. Les données sont lues directement dans la ligne de commande, ou bien dans un fichier au format XML (voir dans le dossier demo)
 
-Le graphique est enregistré au format png et peut être visualisé directement à l'écran.
-## Utilisation
-` pie [-o outputFileName] [-f inputFileName] [-t title] [-d] [-i] [-s size] [-b backgroundColor] [-h] label1 valeur1 label2 valeur2 ... `
-
-Si l'option -f est présente, les arguments label1 valeur1 ... seront ignorés
+This C project allows you to generate pie charts and histograms from the command line. The data is read directly in the command line, or in a file in XML format (see in the demo folder)
 
 
-	 -o		Enregistre dans le fichier. Défault : pieChart.png
-	 -f		Lit les données dans le fichier au format XML
+
+The graph is saved in png format and can be viewed directly on the screen.
+## Use
+
+` pie [-o outputFileName] [-f inputFileName] [-t title] [-d] [-i] [-s size] [-b backgroundColor] [-h] label1 value1 label2 value2 ... `
+
+If the -f option is present, the arguments label1 value1 ... will be ignored
+
+## Options
+
+	 -o		Save to file. Default output filename is pieChart.png
+	 -f		Read data from file in XML format
 			 <datas>
 				<data>
 					<label>
@@ -22,11 +27,12 @@ Si l'option -f est présente, les arguments label1 valeur1 ... seront ignorés
 				</data>
 				...
 			</datas>
-	 -t		Titre du graphique - Valeur par défaut : Mon Graphique
-	 -d		Display : affiche le graphique
-	 -i		Histogramme - Par défaut le graphique est de type pie (camembert)
-	 -s		Taille de l'image en pixels. l'option -h permet de connaitre la taille minimale autorisée et la taille par défaut.
-	 -b		Couleur du fond. Les valeurs autorisées sont white et gray. La couleur de fond par défaut est black.
-	 -h		Help : Affiche cette page d'aide
+	 -t		Chart Title. Default: My Chart.
+	 -d		Display. Displays the graph on the screen.
+	 -i		Histogram. By default the graph is a pie chart.
+	 -s		Chart size in pixel. The -h option lets you know the minimum authorized size and the default size.
+	 -b		Background color. Valid values ​​are white and gray. The default background color is black.
+	 -h		Help : Display this help page.
+
 
 

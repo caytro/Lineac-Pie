@@ -131,7 +131,7 @@ int main (int argc, char **argv)
         }
         else if (strcmp(bgColorOpt,"gray")==0)
         {
-            myPalette[0] = createColor("bgColor",0,128,128,128);
+            myPalette[0] = createColor("bgColor",0,200,200,200);
             myPalette[1] = createColor("fgColor",1,0,0,0);
         }
         else
