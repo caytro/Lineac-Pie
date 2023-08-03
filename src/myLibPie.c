@@ -33,6 +33,7 @@ void clearPieData(PieData *pieData){
     if(pieData->next != NULL)
     {
         clearPieData(pieData->next);
+
     }
     free(pieData);
 }
@@ -51,6 +52,7 @@ void clearPalette(Color **palette)
     for (int i=0;i < NB_COLOR_PALETTE; i++)
     {
         free(palette[i]);
+
     }
 }
 
@@ -64,7 +66,7 @@ Color *createColor(char *nom, int indice, int red, int green, int blue){
     return newColor;
 }
 PieData *createPieData(char *label, double val){
-    PieData *new = malloc(sizeof(PieData));
+    PieData *new = (PieData *)malloc(sizeof(PieData));
     strcpy(new->label,label);
     new->valeur = val;
     new->next = NULL;
@@ -73,7 +75,7 @@ PieData *createPieData(char *label, double val){
 
 PieChart *newPieChart(char *titre)
 {
-    PieChart *new = malloc(sizeof(PieChart));
+    PieChart *new = (PieChart *)malloc(sizeof(PieChart));
     strcpy(new->titre,titre);
     new->type = TYPE_PIE; // valeur par défaut
     new->first=NULL;
