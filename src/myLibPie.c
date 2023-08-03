@@ -23,8 +23,39 @@
  * @param blue
  * @return
  */
+
+
+/***
+ * Libération de la mémoire
+ ***/
+
+void clearPieData(PieData *pieData){
+    if(pieData->next != NULL)
+    {
+        clearPieData(pieData->next);
+    }
+    free(pieData);
+}
+
+void clearPieChart(PieChart *pieChart)
+{
+    if (pieChart->first != NULL)
+    {
+        clearPieData(pieChart->first);
+    }
+    free(pieChart);
+}
+
+void clearPalette(Color **palette)
+{
+    for (int i=0;i < NB_COLOR_PALETTE; i++)
+    {
+        free(palette[i]);
+    }
+}
+
 Color *createColor(char *nom, int indice, int red, int green, int blue){
-    Color *newColor = malloc(sizeof(Color));
+    Color *newColor = (Color *)malloc(sizeof(Color));
     strncpy(newColor->nom,nom,254);
     newColor->indice = indice;
     newColor->red = red;

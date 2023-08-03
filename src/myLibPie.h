@@ -18,9 +18,10 @@
 #include "gdfontl.h"
 #include "gdfontg.h"
 
-#define IMAGE_SIZE 712
-#define MIN_IMAGE_SIZE 128
-#define H_TITRE 80
+#define IMAGE_SIZE 712  // dimension par défaut de la zone de graphique
+#define MIN_IMAGE_SIZE 128  // dimension minimum en pixel de la zone de graphique autorisée avec l'option -s size
+#define H_TITRE 80    // hauteur de la zone de titre en pixel
+#define NB_COLOR_PALETTE 12 // nombre de couleurs dans la palette
 #define TYPE_PIE 1
 #define TYPE_HISTO 2
 #define TYPE_3D 3
@@ -44,6 +45,13 @@ typedef struct {
     int green;
     int blue;
 } Color;
+
+
+void clearPieData(PieData *pieData);
+
+void clearPieChart(PieChart *pieChart);
+
+void clearPalette(Color **palette);
 
 /**
  * @brief createColor

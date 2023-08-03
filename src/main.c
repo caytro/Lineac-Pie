@@ -43,7 +43,7 @@ int main (int argc, char **argv)
     int imageSize = IMAGE_SIZE;
     int c, index;
 
-    Color *myPalette[16];
+    Color *myPalette[NB_COLOR_PALETTE];
 
     opterr = 0;
     // lecture des options -t titre -o outputfile -d (display) -f inputFile -h (help) -i (histogramme) -s (size) -b (backgroundColor)
@@ -132,6 +132,9 @@ int main (int argc, char **argv)
 
     // -b
 
+
+    // colors libGd : La première couleur allouée est affectée au backgroud, la deuxième au foreground
+
     if (bgColorOpt)
     {
         if (strcmp(bgColorOpt,"white")==0)
@@ -212,7 +215,14 @@ int main (int argc, char **argv)
     myPalette[9]=createColor("lightGray",2,200,200,200);
     myPalette[10]=createColor("darkGray",2,30,30,30);
     myPalette[11]=createColor("black",2,0,0,0);
-    int gdColors[12];
+//    myPalette[12]=createColor("vertClair",2,200,255,200);
+//    myPalette[13]=createColor("mauve",2,128,0,128);
+//    myPalette[14]=createColor("aqua",2,200,255,220);
+//    myPalette[115]=createColor("marron",2,128,64,0);
+
+
+
+    int gdColors[NB_COLOR_PALETTE];
     for (int colorIndex = 0; colorIndex<12; colorIndex++)
     {
         gdColors[colorIndex] = gdImageColorAllocate(im,myPalette[colorIndex]->red,myPalette[colorIndex]->green,myPalette[colorIndex]->blue);
@@ -220,7 +230,6 @@ int main (int argc, char **argv)
     int gdBgColor = gdColors[0];
     int gdFgColor = gdColors[1];
     int gdBlackColor = gdColors[11];
-
     // Fonts
     gdFontPtr fonts[5];
     fonts[0] = gdFontGetTiny ();
@@ -327,10 +336,10 @@ int main (int argc, char **argv)
         double ratioAngle = calcRatioPourcent(pieChart);
         double curAngle = 0.0;
         char label[256];
-        gdImageFilledEllipse(im, xc  , yc + 40, w+2,h +2,gdFgColor);
-        PieData *curPieData = pieChart->first;
+        //gdImageFilledEllipse(im, xc  , yc + 40, w+2,h +2,gdFgColor);
         int colorIndex=2;
-        for(int offset =0; offset <10; offset ++)
+        gdImageSetThickness(im,2);
+        for(int offset =0; offset <100; offset ++)
         {
             PieData *curPieData = pieChart->first;
             int colorIndex=2;
@@ -339,38 +348,38 @@ int main (int argc, char **argv)
             while(curPieData != NULL) // le bas
             {
                 double curAngle2 = curAngle  + curPieData->valeur * ratioAngle * 360.0 /100.0;
-                gdImageFilledArc(im,xc ,yc + 40 - 4*offset,w,h,(int)curAngle,(int)curAngle2,gdColors[colorIndex],0);
 
+                gdImageFilledArc(im,xc ,yc + 40 - 0.4*offset,w,h,(int)(round(curAngle+1)),(int)(round(curAngle2-1)),gdColors[colorIndex],0);
+                int x = xc + (w/2) * cos((curAngle2 -1) * M_PI /180.0);
+                int y = yc + 40 - (0.4 * offset) +(h/2) * sin ((curAngle2 -1) * M_PI /180.0);
+                gdImageLine(im,x,y,x,y+1,gdFgColor);
+                x = round(xc + (w/2) * cos((curAngle +1) * M_PI /180.0));
+                y = round(yc + 40 - (0.4 * offset) +(h/2) * sin ((curAngle +1) * M_PI /180.0));
+                gdImageLine(im,x,y,x,y+1,gdFgColor);
+                if(offset ==0)
+                {
+                    gdImageArc(im,xc ,yc +40,w,h,round(curAngle+1),round(curAngle2-1),gdFgColor);
+                }
                 curAngle = curAngle2;
                 colorIndex++;
                 curPieData = curPieData->next;
 
             }
         }
-        curPieData = pieChart->first;
+
+        PieData *curPieData = pieChart->first;
         colorIndex=2;
-        curAngle = 0.0;
-        gdImageSetThickness(im,3);
-        curAngle = 0.0;
-        while(curPieData != NULL) // les montants
-        {
-
-            int x1 = xc + w *cos(curAngle * M_PI /180) / 2;
-            int y1 = yc + h * sin (curAngle * M_PI /180) / 2;
-            gdImageLine(im, x1,y1,x1,y1+40, gdBgColor);
-
-            curAngle = curAngle + curPieData->valeur * ratioAngle * 360.0 /100.0;
-            curPieData = curPieData->next;
-
-        }
-        curPieData = pieChart->first;
-        colorIndex=2;
-        gdImageFilledEllipse(im, xc , yc, w+2,h +2,gdFgColor);
+        //gdImageFilledEllipse(im, xc , yc, w+2,h +2,gdFgColor);
         curAngle = 0.0;
         while(curPieData != NULL) //le haut
         {
             double curAngle2 =curAngle  + curPieData->valeur * ratioAngle * 360.0 /100.0;
-            gdImageFilledArc(im,xc,yc,w,h,(int)curAngle, (int)curAngle2 , gdColors[colorIndex],0);
+
+
+            gdImageArc(im,xc ,yc,w,h,round(curAngle+1),round(curAngle2-1),gdFgColor);
+            gdImageLine(im,xc,yc,xc +round((w/2) * cos ((curAngle+1)*M_PI /180)),yc +round((h/2) * sin ((curAngle+1)*M_PI /180)),gdFgColor);
+            gdImageLine(im,xc,yc,xc +(w/2) * cos ((curAngle2-1)*M_PI /180),yc  +(h/2) * sin ((curAngle2-1)*M_PI /180),gdFgColor);
+
             // label
             int xText = (int) (xc + textRadius * cos ( (curAngle + curAngle2)/2 * M_PI/180 ));
             int yText = (int) (yc + textRadius * zRatio * sin ( (curAngle + curAngle2)/2 * M_PI/180 ));
@@ -392,6 +401,7 @@ int main (int argc, char **argv)
             colorIndex++;
             curPieData = curPieData->next;
         }
+        //gdImageEllipse(im,xc,yc,w,h,gdFgColor);
 
 
     }
@@ -408,5 +418,10 @@ int main (int argc, char **argv)
         int status = system(commande);
         return status;
      }
+
+    // Libération mémoire
+
+    clearPieChart(pieChart);
+    clearPalette(myPalette);
     return 0;
 }
