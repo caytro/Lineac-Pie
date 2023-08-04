@@ -41,7 +41,7 @@ If the -f option is present, the arguments label1 value1 ... will be ignored
 
 `pie -f demos/datas.xml -d  -o "demos/graph-Pie-bggray.png"  -s1024 -t "Mon Pie Chart Sur fond gris" -bgray`
 
-`pie  -d  -o "demos/graph-Pie-bggray.png"  -i -t "Mon Histogramme sur fond noir" Toulouse 25 Marseille 20 Lille 12 Rodez 14 "St Girons" 17`
+`pie  -d  -o "demos/graph-Pie-bggray.png"  -i -t "Mon Histogramme sur fond gris" -bgray Toulouse 25 Marseille 20 Lille 12 Rodez 14 "St Girons" 17`
 	
 `pie -f demos/datas.xml -d  -3 -o "demos/graph-Pie-3D.png"  -s512 -t "Mon Pie Chart 3D sur fond noir"`
 
@@ -49,7 +49,7 @@ See output png examples in demos directory
 
 ## Compilation 
 
-Compilation requires libm and libgc
+Compilation requires libm and libgd
 
 `gcc -c  src/main.c src/myLibPie.c src/myLibXML.c`
 
