@@ -46,7 +46,7 @@ int main (int argc, char **argv)
     Color *myPalette[NB_COLOR_PALETTE];
 
     opterr = 0;
-    // lecture des options -t titre -o outputfile -d (display) -f inputFile -h (help) -i (histogramme) -s (size) -b (backgroundColor)
+    // lecture des options -t titre -o outputfile -d (display) -f inputFile -h (help) -i (histogramme) -s (size) -b (backgroundColor) -3 (3DPie)
 
     while( (c = getopt (argc, argv,"dt:o:f:his:b:3")) != -1)
     {
@@ -81,7 +81,7 @@ int main (int argc, char **argv)
                 d3Opt = 1;
             break;
             case '?':
-                if ((optopt == 't')||(optopt == 'o')||(optopt == 's')||(optopt == 'b'))
+                if ((optopt == 't')||(optopt == 'o')||(optopt == 's')||(optopt == 'b')||(optopt == 'f'))
                       fprintf (stderr, "Option -%c requires an argument.\n", optopt);
                 else if (isprint (optopt))
                   fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -104,7 +104,7 @@ int main (int argc, char **argv)
         return 0;
     }
 
-    // -s
+    // -s size
 
     if (sFlag == 1 )
     {
@@ -193,7 +193,7 @@ int main (int argc, char **argv)
         pieChart->type = TYPE_3D;  // prévoir un systeme de flags pour pie, histo 2D et 3D
     }
 
-    // check datas
+    // check data integrity
 
     if (checkPieChartIntegrity(pieChart) != 0){
         printf("\n** Erreur : Les datas contiennent des valeurs non conformes\n");
@@ -221,6 +221,8 @@ int main (int argc, char **argv)
 //    myPalette[115]=createColor("marron",2,128,64,0);
 
 
+    // Allocation des couleurs définies dans la palette de l'image
+    // et stockage dans tableau pour utilisation dans les boucles
 
     int gdColors[NB_COLOR_PALETTE];
     for (int colorIndex = 0; colorIndex<12; colorIndex++)
@@ -333,19 +335,18 @@ int main (int argc, char **argv)
         int h = imageSize * ratio * zRatio;
         int textRadius = w /2 * 1.4;
         int percentRadius = w * 0.4;
-        double ratioAngle = calcRatioPourcent(pieChart);
+        double ratioAngle = calcRatioPourcent(pieChart);  // Normalise les données de pieChart pour que la somme des valeurs soit égale à 100 (affichage en pourcentage)
         double curAngle = 0.0;
         char label[256];
-        //gdImageFilledEllipse(im, xc  , yc + 40, w+2,h +2,gdFgColor);
         int colorIndex=2;
         gdImageSetThickness(im,1);
-        for(int offset =0; offset <100; offset ++)
+        for(int offset =0; offset <100; offset ++)  // empile des couches façon imprimante 3D pour obtenir le rendu 3D
         {
             PieData *curPieData = pieChart->first;
-            int colorIndex=2;
-            double curAngle = 0.0;
+            int colorIndex=2;  // les indices 0 et 1 sont réservées pour backgroundColor et foregroundColor resp.
+            curAngle = 0.0;
 
-            while(curPieData != NULL) // le bas
+            while(curPieData != NULL)
             {
                 double curAngle2 = curAngle  + curPieData->valeur * ratioAngle * 360.0 /100.0;
 
@@ -372,9 +373,8 @@ int main (int argc, char **argv)
 
         PieData *curPieData = pieChart->first;
         colorIndex=2;
-        //gdImageFilledEllipse(im, xc , yc, w+2,h +2,gdFgColor);
         curAngle = 0.0;
-        while(curPieData != NULL) //le haut
+        while(curPieData != NULL) // Trace les contours de la face supérieure et affiche les pourcentages et les labels
         {
             double curAngle2 =curAngle  + curPieData->valeur * ratioAngle * 360.0 /100.0;
 
@@ -403,16 +403,18 @@ int main (int argc, char **argv)
             colorIndex++;
             curPieData = curPieData->next;
         }
-        //gdImageEllipse(im,xc,yc,w,h,gdFgColor);
-
 
     }
 
 
-    // enregistrement
+    // Enregistrement
+
     FILE *out = fopen(ficOut,"wb");
     gdImagePng(im,out);
     fclose(out);
+
+    // Display
+
     if (display)
     {
         char commande[300];
@@ -422,6 +424,7 @@ int main (int argc, char **argv)
      }
 
     // Libération mémoire
+
     gdImageDestroy(im);
     clearPieChart(pieChart);
     clearPalette(myPalette);

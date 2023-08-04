@@ -29,6 +29,10 @@
  * Libération de la mémoire
  ***/
 
+/**
+ * @brief clearPieData
+ * @param pieData
+ */
 void clearPieData(PieData *pieData){
     if(pieData->next != NULL)
     {
@@ -38,6 +42,10 @@ void clearPieData(PieData *pieData){
     free(pieData);
 }
 
+/**
+ * @brief clearPieChart
+ * @param pieChart
+ */
 void clearPieChart(PieChart *pieChart)
 {
     if (pieChart->first != NULL)
@@ -47,6 +55,10 @@ void clearPieChart(PieChart *pieChart)
     free(pieChart);
 }
 
+/**
+ * @brief clearPalette
+ * @param palette
+ */
 void clearPalette(Color **palette)
 {
     for (int i=0;i < NB_COLOR_PALETTE; i++)
@@ -55,6 +67,16 @@ void clearPalette(Color **palette)
 
     }
 }
+
+/**
+ * @brief createColor
+ * @param nom
+ * @param indice
+ * @param red
+ * @param green
+ * @param blue
+ * @return Color *newColor
+ */
 
 Color *createColor(char *nom, int indice, int red, int green, int blue){
     Color *newColor = (Color *)malloc(sizeof(Color));
@@ -65,6 +87,13 @@ Color *createColor(char *nom, int indice, int red, int green, int blue){
     newColor->blue = blue;
     return newColor;
 }
+
+/**
+ * @brief createPieData
+ * @param label
+ * @param val
+ * @return PieData *newPieData
+ */
 PieData *createPieData(char *label, double val){
     PieData *new = (PieData *)malloc(sizeof(PieData));
     strcpy(new->label,label);
@@ -73,6 +102,11 @@ PieData *createPieData(char *label, double val){
     return new;
 }
 
+/**
+ * @brief newPieChart
+ * @param titre
+ * @return PieChart *pieChart
+ */
 PieChart *newPieChart(char *titre)
 {
     PieChart *new = (PieChart *)malloc(sizeof(PieChart));
@@ -82,7 +116,13 @@ PieChart *newPieChart(char *titre)
     return new;
 }
 
-
+/**
+ * @brief appendPieData
+ * @param pieChart
+ * @param label
+ * @param val
+ * @return PieChart *updatedPieChart
+ */
 PieChart *appendPieData(PieChart *pieChart,char *label, double val)
 {
     PieData *newPieData = createPieData(label,val);
@@ -96,6 +136,11 @@ PieChart *appendPieData(PieChart *pieChart,char *label, double val)
     return pieChart;
 }
 
+/**
+ * @brief getPieChartDataCount
+ * @param pieChart
+ * @return int PieChartDataCount
+ */
 int getPieChartDataCount(PieChart *pieChart)
 {
     PieData *curPieData = pieChart->first;
@@ -108,6 +153,12 @@ int getPieChartDataCount(PieChart *pieChart)
     }
     return cpt;
 }
+
+/**
+ * @brief checkPieChartIntegrity
+ * @param pieChart
+ * @return 0 if OK. 1 if one value is <=0. 2 if empty
+ */
 int checkPieChartIntegrity(PieChart *pieChart)
 {
     PieData *curPieData = pieChart->first;
@@ -119,6 +170,12 @@ int checkPieChartIntegrity(PieChart *pieChart)
     }
     return 0;
 }
+
+/**
+ * @brief calcRatioPourcent
+ * @param pieChart
+ * @return double ratio : coef. à appliquer pour avoir un total de 100 (pourcents)
+ */
 double calcRatioPourcent(PieChart *pieChart) //calcule le ratio à appliquer pour avoir un total de 100(pour cents)
 {
     double total = 0.0;
@@ -131,6 +188,11 @@ double calcRatioPourcent(PieChart *pieChart) //calcule le ratio à appliquer pou
     return 100.0 / total;
 }
 
+/**
+ * @brief getMaxPieChartValue
+ * @param pieChart
+ * @return double maxPieChartValue. Used to scale Hist
+ */
 double getMaxPieChartValue(PieChart *pieChart)
 {
     PieData *curPieData = pieChart->first;
@@ -143,13 +205,25 @@ double getMaxPieChartValue(PieChart *pieChart)
     return max;
 }
 
-
+/**
+ * @brief parseError
+ * @param pieChart
+ * @param chaineLue
+ * @param ligne
+ * @return PieChart* = NULL displays error message while parsing XML file
+ */
 PieChart *parseError(PieChart *pieChart, char *chaineLue,int ligne){
     printf("\n** Parse Error ligne %d\n",ligne);
     printf("Chaine Lue '%s'\n",chaineLue);
     return NULL;
 }
 
+/**
+ * @brief readDataFile
+ * @param pieChart
+ * @param ficIn
+ * @return PieChart *pieChart generated from data read in ficin
+ */
 PieChart *readDataFile(PieChart *pieChart,char *ficIn)
 {
     FILE *fp = fopen(ficIn,"r");
@@ -184,6 +258,11 @@ PieChart *readDataFile(PieChart *pieChart,char *ficIn)
     fclose(fp);
     return pieChart;
 }
+
+/**
+ * @brief displayHelp
+ * @param execName
+ */
 
 void displayHelp(char *execName)
 {

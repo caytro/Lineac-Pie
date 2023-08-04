@@ -3,7 +3,14 @@
 #include <unistd.h>
 #include <string.h>
 
-
+/**
+ * @brief openTagXML
+ * @param fp
+ * @param nomChamp
+ * @param level
+ * @param chaineRetour
+ * @return 0 if OK. 1 if parse error
+ */
 int openTagXML(FILE *fp, char *nomChamp, int level,char *chaineRetour)
 {
     char chaineLue[255]="";
@@ -20,6 +27,14 @@ int openTagXML(FILE *fp, char *nomChamp, int level,char *chaineRetour)
     return 0;
 }
 
+/**
+ * @brief closeTagXML
+ * @param fp
+ * @param nomChamp
+ * @param level
+ * @param chaineLue
+ * @return 0 if OK. 1 if parse error
+ */
 int closeTagXML(FILE *fp, char *nomChamp, int level, char *chaineLue)
 {
     char chaineCmp[255]="";
@@ -34,6 +49,15 @@ int closeTagXML(FILE *fp, char *nomChamp, int level, char *chaineLue)
     return 0;
 }
 
+/**
+ * @brief search parseXML field <nomChamp>*result</nomChamp> in FILE *fp
+ * @param fp
+ * @param nomChamp
+ * @param level \t count
+ * @param result
+ * @param chaineLue
+ * @return
+ */
 int parseXML(FILE *fp,char *nomChamp, int level, char *result, char *chaineLue){
     char chaineCmp[255]="";
     char tabs[10]="";
